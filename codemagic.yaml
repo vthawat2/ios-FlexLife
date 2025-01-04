@@ -1,127 +1,81 @@
 workflows:
 
- react-native-ios:
+  my-workflow:
 
-        name: React Native iOS
+    name: My workflow name
 
-        max_build_duration: 120
+    labels:
 
-        instance_type: mac_mini_m2
+      - QA
 
-        integrations:
+      - ${TENANT_NAME}
 
-          app_store_connect: codemagic
+    instance_type: mac_mini_m2
 
-        environment:
+    max_build_duration: 60
 
-          ios_signing:
+    inputs: # more information about build inputs:https://docs.codemagic.io/knowledge-codemagic/build-inputs/
 
-            distribution_type: app_store
+      name: # input ID
 
-            bundle_identifier: io.codemagic.sample.reactnative
+        description: Input description
 
-          vars:
+        default: Codemagic
 
-            XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # <-- Put the name of your Xcode workspace here
+    environment:
 
-            XCODE_SCHEME: "CodemagicSample" # <-- Put the name of your Xcode scheme here
+      groups:
 
-            APP_ID: 1555555551 # <-- Put the app id number here. This is found in App Store Connect > App > General > App Information
+        - group_name
 
-          node: v19.7.0
+      vars:
 
-          xcode: latest
+        PUBLIC_ENV_VAR: "value here"
 
-          cocoapods: default
+      flutter: stable
 
-        scripts:
+      xcode: latest
 
-            - name: Install npm dependencies
+    cache:
 
-              script: |
+      cache_paths:
 
-                npm install                
+        - ~/.pub-cache
 
-            - name: Install CocoaPods dependencies
+    triggering:
 
-              script: |
+      events:
 
-                cd ios && pod install                
+        - push
 
-            - name: Set Info.plist values
+      branch_patterns:
 
-              script: |
+        - pattern: '*'
 
-                # This allows publishing without manually answering the question about encryption 
+          include: true
 
-                PLIST=$CM_BUILD_DIR/$XCODE_SCHEME/Info.plist
+          source: true
 
-                PLIST_BUDDY=/usr/libexec/PlistBuddy
+      cancel_previous_builds: false
 
-                $PLIST_BUDDY -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST                
+    scripts:
 
-            - name: Set up code signing settings on Xcode project
+      - echo "Hello, ${{ inputs.name }}"
 
-              script: |
+      - ...
 
-                xcode-project use-profiles --warn-only                
+    artifacts:
 
-            - name: Increment build number
+      - build/**/outputs/bundle/**/*.aab
 
-              script: |
+    publishing:
 
-                cd $CM_BUILD_DIR/ios
+      email:
 
-                LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_ID")
+        recipients:
 
-                agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))                
+          - name@example.com
 
-            - name: Build ipa for distribution
+      scripts:
 
-              script: |
-
-                xcode-project build-ipa \
-
-                  --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
-
-                  --scheme "$XCODE_SCHEME"                
-
-        artifacts:
-
-            - build/ios/ipa/*.ipa
-
-            - /tmp/xcodebuild_logs/*.log
-
-            - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-
-            - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-
-        publishing:
-
-          email:
-
-            recipients:
-
-              - user_1@example.com
-
-              - user_2@example.com
-
-            notify:
-
-              success: true
-
-              failure: false
-
-          app_store_connect:
-
-            auth: integration
-
-            submit_to_testflight: true
-
-            beta_groups: # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
-
-              - group name 1
-
-              - group name 2
-
-            submit_to_app_store: false
+        - echo 'Post-publish script'
