@@ -31,7 +31,7 @@ workflows:
         script: | 
 
           xcode-project use-profiles
-            --project=XCODE_PROJECT_PATTERN
+            --project=**/*.xcodeproj
 
       - name: Get Flutter packages
 
