@@ -28,10 +28,6 @@ workflows:
 
       - name: Set up code signing settings on Xcode project
 
-        script: | 
-
-          xcode-project
-
       - name: Get Flutter packages
 
         script: | 
