@@ -30,8 +30,7 @@ workflows:
 
         script: | 
 
-          xcode-project use-profiles
-            --project FlexLife.xcodeproj
+
 
       - name: Get Flutter packages
 
