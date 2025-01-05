@@ -31,13 +31,14 @@ workflows:
         script: | 
 
           xcode-project use-profiles
+            --project=XCODE_PROJECT_PATTERN
 
       - name: Get Flutter packages
 
         script: | 
 
           flutter upgrade
-          
+
           flutter pub get
 
       - name: Install pods
