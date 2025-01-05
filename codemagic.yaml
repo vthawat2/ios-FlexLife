@@ -36,6 +36,8 @@ workflows:
 
         script: | 
 
+          flutter upgrade
+          
           flutter pub get
 
       - name: Install pods
