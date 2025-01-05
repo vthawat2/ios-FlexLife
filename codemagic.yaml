@@ -30,7 +30,7 @@ workflows:
 
         script: | 
 
-          xcode-project
+          xcode-project use-profiles
 
       - name: Get Flutter packages
 
